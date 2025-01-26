@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline HTML Code Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Offline HTML Code Tester</h1>
+    <textarea id="codeInput" placeholder="Write your HTML code here"></textarea>
+    <button onclick="runCode()">Run</button>
+    <iframe id="preview"></iframe>
+
+    <script>
+        function runCode() {
+            const code = document.getElementById('codeInput').value;
+            const previewFrame = document.getElementById('preview');
+            previewFrame.srcdoc = code;
+        }
+    </script>
+</body>
+</html>

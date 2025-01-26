@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            height: 100vh;
+            margin: 0;
+        }
+        textarea {
+            width: 35%;
+            height: 85%;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        iframe {
+            width: 60%;
+            height: 85%;
+            border: 1px solid #ccc;
+        }
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            width: 35%;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <h2>HTML Code</h2>
+        <textarea id="htmlCode">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Page</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is a paragraph of text.</p>
+</body>
+</html>
+        </textarea>
+
+        <h2>CSS Code</h2>
+        <textarea id="cssCode">
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+h1 {
+    color: #333;
+}
+p {
+    font-size: 18px;
+}
+        </textarea>
+
+        <h2>JavaScript Code</h2>
+        <textarea id="jsCode">
+document.querySelector("h1").addEventListener("click", function() {
+    alert("Hello, you clicked the header!");
+});
+        </textarea>
+
+        <button onclick="runCode()">Run Code</button>
+    </div>
+
+    <iframe id="output"></iframe>
+
+    <script>
+        function runCode() {
+            const html = document.getElementById('htmlCode').value;
+            const css = document.getElementById('cssCode').value;
+            const js = document.getElementById('jsCode').value;
+
+            const iframe = document.getElementById('output');
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+
+            iframeDocument.open();
+            iframeDocument.write(`
+                <html>
+                <head>
+                    <style>${css}</style>
+                </head>
+                <body>${html}</body>
+                <script>${js}<\/script>
+                </html>
+            `);
+            iframeDocument.close();
+        }
+    </script>
+</body>
+</html>

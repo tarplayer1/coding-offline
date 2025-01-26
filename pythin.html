@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run Python in Browser</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.11.0/brython.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        textarea, pre {
+            width: 400px;
+            height: 300px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            resize: none;
+        }
+
+        pre {
+            background-color: #f9f9f9;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body onload="brython()">
+    <h1>Run Python in Browser</h1>
+    <div class="container">
+        <!-- Python code input box -->
+        <textarea id="python-code">print("Hello, Python in the Browser!")</textarea>
+        <!-- Output display box -->
+        <pre id="output">Your output will appear here...</pre>
+    </div>
+    <button id="run-button">Run Python</button>
+
+    <script type="text/python">
+from browser import document, console
+
+def run_python(event):
+    # Get the output element and clear it
+    output = document["output"]
+    output.text = ""
+
+    try:
+        # Redirect Python's print function to update the output element
+        def custom_print(*args):
+            output.text += " ".join(str(arg) for arg in args) + "\n"
+        console.log("Redirecting print to custom output...")
+        
+        # Execute the code from the textarea
+        code = document["python-code"].value
+        exec(code, {"print": custom_print})
+    except Exception as e:
+        # Display any errors in the output element
+        output.text = f"Error: {str(e)}"
+
+# Bind the function to the button's click event
+document["run-button"].bind("click", run_python)
+    </script>
+</body>
+</html>

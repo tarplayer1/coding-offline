@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline BASIC Emulator</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #1e1e1e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        textarea {
+            width: 80%;
+            height: 200px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            background: #121212;
+            color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        pre {
+            width: 80%;
+            height: 300px;
+            background: #000;
+            color: #0f0;
+            overflow: auto;
+            padding: 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>BASIC Emulator</h1>
+    <textarea id="basic-code" placeholder="Type your BASIC code here...">10 LET A=40\n20 LET B=22\n30 LET C=18\n40 PRINT A+B-C\n50 END</textarea>
+    <button id="run-basic">Run BASIC</button>
+    <pre id="output">Your output will appear here...</pre>
+
+    <script>
+        function runBasicProgram(code) {
+            const lines = code.split('\n');
+            let output = "";
+            let pointer = 0;
+            const variables = {}; // Object to store variables
+
+            // Start running the program line by line
+            while (pointer < lines.length) {
+                const line = lines[pointer].trim();
+                if (!line) {
+                    pointer++;
+                    continue; // Skip empty lines
+                }
+
+                const parts = line.split(' '); // Split by spaces
+                const lineNumber = parts[0];
+                const command = parts[1].toUpperCase();
+                const args = parts.slice(2).join(' ').trim();
+
+                // Handle the commands
+                switch (command) {
+                    case "LET":
+                        const [varName, expr] = args.split('=');
+                        variables[varName.trim()] = evaluateExpression(expr, variables); // Store variable values in the 'variables' object
+                        break;
+                    case "PRINT":
+                        const printExpr = evaluateExpression(args, variables);
+                        output += printExpr + "\n";
+                        break;
+                    case "GOTO":
+                        const targetLineNumber = parseInt(args);
+                        pointer = lines.findIndex((l) => l.trim().startsWith(targetLineNumber));
+                        continue; // Skip the pointer increment to jump to the line directly
+                    case "END":
+                        pointer = lines.length; // End the program
+                        break;
+                    default:
+                        break;
+                }
+
+                pointer++;
+            }
+
+            return output || "Program ran successfully but produced no output.";
+        }
+
+        function evaluateExpression(expr, variables) {
+            // This function will evaluate simple expressions like "A+B-C"
+            const cleanedExpr = expr.replace(/[A-Za-z]/g, match => variables[match.trim()] || match); // Replace variables with their values
+            try {
+                return Function('"use strict"; return (' + cleanedExpr + ')')(); // Safely evaluate the expression
+            } catch (e) {
+                return "Error in expression"; // Return error message if eval fails
+            }
+        }
+
+        document.getElementById("run-basic").addEventListener("click", () => {
+            const code = document.getElementById("basic-code").value;
+            const outputElement = document.getElementById("output");
+            try {
+                const result = runBasicProgram(code);
+                outputElement.textContent = result;
+            } catch (e) {
+                outputElement.textContent = "Error: " + e.message;
+            }
+        });
+    </script>
+</body>
+</html>

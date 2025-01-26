@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline JavaScript Code Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        pre, #countdownOutput {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+        #countdownOutput {
+            height: 100px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h1>Offline JavaScript Code Tester</h1>
+    <textarea id="codeInput" placeholder="Write your JavaScript code here"></textarea>
+    <button onclick="runCode()">Run</button>
+    <pre id="output"></pre>
+
+    <h2>Countdown Output</h2>
+    <div id="countdownOutput"></div>
+
+    <script>
+        function runCode() {
+            const code = document.getElementById('codeInput').value;
+            const outputElement = document.getElementById('output');
+            const countdownOutputElement = document.getElementById('countdownOutput');
+
+            // Clear previous output
+            outputElement.textContent = "";
+            countdownOutputElement.textContent = "";
+
+            try {
+                // Run the JavaScript code and capture the result
+                const result = eval(code);
+                outputElement.textContent = result !== undefined ? result : "Code ran successfully!";
+
+                // If the code contains the "startCountdown" function, run it
+                if (code.includes("startCountdown")) {
+                    startCountdown();
+                }
+            } catch (err) {
+                // Display errors in the output if there are any
+                outputElement.textContent = "Error: " + err.message;
+            }
+        }
+
+        // Countdown timer example
+        function startCountdown() {
+            let countdown = 10;
+            const countdownOutputElement = document.getElementById('countdownOutput');
+
+            const timer = setInterval(function() {
+                countdownOutputElement.textContent += countdown + "\n"; // Append to output
+                countdown--;
+
+                if (countdown < 0) {
+                    clearInterval(timer);
+                    countdownOutputElement.textContent += "Countdown finished!";
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
