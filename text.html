@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: black;
+            color: white;
+        }
+        #editor {
+            width: 80%;
+            height: 300px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload & Edit Files</h1>
+    <input type="file" id="fileInput" />
+    <select id="fileSelect"></select>
+    <input type="text" id="renameInput" placeholder="Rename file..." />
+    <button id="renameButton">Rename</button>
+    <textarea id="editor"></textarea>
+    <button id="saveButton">Save</button>
+    <button id="downloadButton">Download</button>
+    
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileSelect = document.getElementById('fileSelect');
+        const renameInput = document.getElementById('renameInput');
+        const renameButton = document.getElementById('renameButton');
+        const saveButton = document.getElementById('saveButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const editorElement = document.getElementById('editor');
+        const editor = CodeMirror.fromTextArea(editorElement, {
+            mode: "javascript",
+            lineNumbers: true,
+            theme: "default"
+        });
+        let files = {};
+        let currentFile = "";
+        
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    files[file.name] = e.target.result;
+                    updateFileSelect();
+                    loadFile(file.name);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        fileSelect.addEventListener('change', function() {
+            loadFile(this.value);
+        });
+
+        function loadFile(filename) {
+            if (filename && files[filename]) {
+                currentFile = filename;
+                editor.setValue(files[filename]);
+            }
+        }
+
+        renameButton.addEventListener('click', function() {
+            const newName = renameInput.value.trim();
+            if (newName && currentFile && files[currentFile]) {
+                files[newName] = files[currentFile];
+                delete files[currentFile];
+                currentFile = newName;
+                updateFileSelect();
+            }
+        });
+
+        saveButton.addEventListener('click', function() {
+            if (currentFile) {
+                files[currentFile] = editor.getValue();
+            }
+        });
+
+        function updateFileSelect() {
+            fileSelect.innerHTML = "";
+            Object.keys(files).forEach(filename => {
+                const option = document.createElement("option");
+                option.value = filename;
+                option.textContent = filename;
+                fileSelect.appendChild(option);
+            });
+            fileSelect.value = currentFile;
+        }
+
+        downloadButton.addEventListener('click', function() {
+            if (currentFile) {
+                const blob = new Blob([files[currentFile]], { type: 'text/plain' });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = currentFile;
+                a.click();
+            }
+        });
+    </script>
+</body>
+</html>
